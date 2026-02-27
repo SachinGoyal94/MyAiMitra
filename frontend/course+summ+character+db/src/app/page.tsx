@@ -15,6 +15,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Loader2, MessageCircle, User, Lock, History, Trash2, Send, Bot, Settings, Sparkles, Clock, UserCircle, Users, FileText, GraduationCap, Database, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import AuthSection from '@/components/home/AuthSection'
+import AuroraBackground from '@/components/ui/AuroraBackground'
+
 
 interface ChatMessage {
   id: number
@@ -42,13 +45,7 @@ export default function Home() {
   const [mockMode, setMockMode] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  // Login form state
-  const [loginUsername, setLoginUsername] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
 
-  // Register form state
-  const [registerUsername, setRegisterUsername] = useState('')
-  const [registerPassword, setRegisterPassword] = useState('')
 
   const API_BASE = 'https://my-ai-mitra.onrender.com'
 
@@ -80,8 +77,8 @@ export default function Home() {
     }
   }
 
-  const handleLogin = async () => {
-    if (!loginUsername || !loginPassword) {
+  const handleLogin = async (username: string, password: string) => {
+    if (!username || !password) {
       setError('Please fill in all fields')
       return
     }
@@ -91,8 +88,8 @@ export default function Home() {
 
     try {
       const formData = new FormData()
-      formData.append('username', loginUsername)
-      formData.append('password', loginPassword)
+      formData.append('username', username)
+      formData.append('password', password)
       formData.append('grant_type', 'password')
 
       const response = await fetch(`${API_BASE}/token`, {
@@ -114,11 +111,9 @@ export default function Home() {
       }
 
       const data = await response.json()
-      const userData = { username: loginUsername, token: data.access_token }
+      const userData = { username, token: data.access_token }
       setUser(userData)
       localStorage.setItem('user', JSON.stringify(userData))
-      setLoginUsername('')
-      setLoginPassword('')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed'
       setError(`${errorMessage}. The backend server may be unavailable.`)
@@ -127,8 +122,8 @@ export default function Home() {
     }
   }
 
-  const handleRegister = async () => {
-    if (!registerUsername || !registerPassword) {
+  const handleRegister = async (username: string, password: string) => {
+    if (!username || !password) {
       setError('Please fill in all fields')
       return
     }
@@ -140,18 +135,13 @@ export default function Home() {
       await apiCall('/register', {
         method: 'POST',
         body: JSON.stringify({
-          username: registerUsername,
-          password: registerPassword,
+          username,
+          password,
         }),
       })
 
       // Auto-login after registration
-      setLoginUsername(registerUsername)
-      setLoginPassword(registerPassword)
-      setRegisterUsername('')
-      setRegisterPassword('')
-
-      setTimeout(() => handleLogin(), 100)
+      setTimeout(() => handleLogin(username, password), 100)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Registration failed'
       setError(`${errorMessage}. The backend server may be unavailable. Try Mock Mode to test the interface.`)
@@ -193,7 +183,7 @@ export default function Home() {
 
     try {
       let response: any
-      
+
       if (mockMode) {
         // Mock response for demo
         await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API delay
@@ -302,275 +292,56 @@ export default function Home() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
-        <style jsx>{`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-          }
-          @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
-          }
-          @keyframes slide-up {
-            from { 
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            to { 
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-          }
-          .float-animation {
-            animation: float 6s ease-in-out infinite;
-          }
-          .pulse-glow {
-            animation: pulse-glow 2s ease-in-out infinite;
-          }
-          .slide-up {
-            animation: slide-up 0.6s ease-out;
-          }
-          .gradient-shimmer {
-            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 3s ease-in-out infinite;
-          }
-        `}</style>
-        <div className="w-full max-w-md slide-up">
-          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
-            <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
-            <CardHeader className="text-center pb-2 relative">
-              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg float-animation pulse-glow">
-                <Sparkles className="w-10 h-10 text-white" />
-              </div>
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                AI Mitra
-              </CardTitle>
-              <CardDescription className="text-lg text-muted-foreground">
-                Your intelligent conversation partner
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2 relative">
-              <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100 p-1 rounded-xl">
-                  <TabsTrigger value="login" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-lg">
-                    Login
-                  </TabsTrigger>
-                  <TabsTrigger value="register" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-lg">
-                    Register
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="login" className="space-y-4 slide-up" style={{animationDelay: '0.1s'}}>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-username" className="text-sm font-medium">Username</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors peer-focus:text-indigo-500" />
-                      <Input
-                        id="login-username"
-                        placeholder="Enter your username"
-                        value={loginUsername}
-                        onChange={(e) => setLoginUsername(e.target.value)}
-                        className="pl-10 h-11 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 focus:scale-[1.02] focus:shadow-lg"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password" className="text-sm font-medium">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors peer-focus:text-indigo-500" />
-                      <Input
-                        id="login-password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        className="pl-10 h-11 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 focus:scale-[1.02] focus:shadow-lg"
-                      />
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={handleLogin} 
-                    disabled={isLoading}
-                    className="w-full h-11 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        Login
-                        <Send className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </TabsContent>
-                
-                <TabsContent value="register" className="space-y-4 slide-up" style={{animationDelay: '0.2s'}}>
-                  <div className="space-y-2">
-                    <Label htmlFor="register-username" className="text-sm font-medium">Username</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors peer-focus:text-indigo-500" />
-                      <Input
-                        id="register-username"
-                        placeholder="Choose a username"
-                        value={registerUsername}
-                        onChange={(e) => setRegisterUsername(e.target.value)}
-                        className="pl-10 h-11 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 focus:scale-[1.02] focus:shadow-lg"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="register-password" className="text-sm font-medium">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors peer-focus:text-indigo-500" />
-                      <Input
-                        id="register-password"
-                        type="password"
-                        placeholder="Choose a password"
-                        value={registerPassword}
-                        onChange={(e) => setRegisterPassword(e.target.value)}
-                        className="pl-10 h-11 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 focus:scale-[1.02] focus:shadow-lg"
-                      />
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={handleRegister} 
-                    disabled={isLoading}
-                    className="w-full h-11 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating Account...
-                      </>
-                    ) : (
-                      <>
-                        Register
-                        <Sparkles className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </TabsContent>
-              </Tabs>
-              
-              {error && (
-                <Alert className="mt-4 border-red-200 bg-red-50 slide-up" style={{animationDelay: '0.3s'}}>
-                  <AlertDescription className="text-red-800">
-                    {error}
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              <div className="mt-6 pt-6 border-t border-gray-200 slide-up" style={{animationDelay: '0.4s'}}>
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Having trouble with the API?
-                  </p>
-                  <Button 
-                    onClick={handleMockLogin}
-                    variant="outline"
-                    className="w-full border-green-200 text-green-700 hover:bg-green-50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Try Mock Mode (Demo)
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Test the interface without backend connection
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <>
+        <AuroraBackground />
+        <AuthSection
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+          onMockLogin={handleMockLogin}
+          isLoading={isLoading}
+          error={error}
+        />
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen relative overflow-hidden text-white">
+      {/* 3D Aurora Background */}
+      <AuroraBackground />
+
       <style jsx>{`
+        .slide-in-right { animation: slide-in-right 0.4s ease-out; }
+        .slide-in-left { animation: slide-in-left 0.4s ease-out; }
+        .bounce-in { animation: bounce-in 0.5s ease-out; }
+        .message-hover { transition: all 0.25s ease; }
+        .message-hover:hover { transform: translateY(-2px); }
         @keyframes slide-in-right {
-          from { 
-            opacity: 0;
-            transform: translateX(50px);
-          }
-          to { 
-            opacity: 1;
-            transform: translateX(0);
-          }
+          from { opacity: 0; transform: translateX(30px); }
+          to { opacity: 1; transform: translateX(0); }
         }
         @keyframes slide-in-left {
-          from { 
-            opacity: 0;
-            transform: translateX(-50px);
-          }
-          to { 
-            opacity: 1;
-            transform: translateX(0);
-          }
+          from { opacity: 0; transform: translateX(-30px); }
+          to { opacity: 1; transform: translateX(0); }
         }
         @keyframes bounce-in {
-          0% { 
-            opacity: 0;
-            transform: scale(0.3);
-          }
+          0% { opacity: 0; transform: scale(0.3); }
           50% { transform: scale(1.05); }
-          70% { transform: scale(0.9); }
-          100% { 
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        @keyframes gradient-shift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        @keyframes typewriter {
-          from { width: 0; }
-          to { width: 100%; }
-        }
-        .slide-in-right {
-          animation: slide-in-right 0.5s ease-out;
-        }
-        .slide-in-left {
-          animation: slide-in-left 0.5s ease-out;
-        }
-        .bounce-in {
-          animation: bounce-in 0.6s ease-out;
-        }
-        .gradient-animated {
-          background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
-          background-size: 400% 400%;
-          animation: gradient-shift 15s ease infinite;
-        }
-        .message-hover {
-          transition: all 0.3s ease;
-        }
-        .message-hover:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+          100% { opacity: 1; transform: scale(1); }
         }
       `}</style>
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm transition-all duration-300">
+      <header className="border-b border-white/10 bg-black/50 backdrop-blur-xl sticky top-0 z-20 shadow-[0_4px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
+              <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] hover:scale-110 transition-all duration-300 glow-pulse">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-sm">
                   AI Mitra
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-indigo-300/70">
                   Welcome back, {user.username}
                   {mockMode && (
                     <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700 border-green-200 animate-pulse">
@@ -582,31 +353,31 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => router.push('/character-chat')}
-                className="flex items-center gap-2 border-purple-200 text-purple-700 hover:bg-purple-50 transition-all duration-300 hover:scale-[1.02]"
+                className="flex items-center gap-2 border-purple-500/30 text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-300 hover:scale-[1.02]"
               >
                 <Users className="w-4 h-4" />
                 Character Chat
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => router.push('/summarizer')}
-                className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50 transition-all duration-300 hover:scale-[1.02]"
+                className="flex items-center gap-2 border-blue-500/30 text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 transition-all duration-300 hover:scale-[1.02]"
               >
                 <FileText className="w-4 h-4" />
                 AI Summarizer
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setUser(null)
                   setMockMode(false)
                   setChatHistory([])
                   localStorage.removeItem('user')
                 }}
-                className="flex items-center gap-2 border-gray-200 hover:bg-gray-50 transition-all duration-300 hover:scale-[1.02]"
+                className="flex items-center gap-2 border-white/20 text-white/70 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]"
               >
                 <Lock className="w-4 h-4" />
                 Logout
@@ -619,78 +390,78 @@ export default function Home() {
       <main className="container mx-auto px-4 py-6">
         {/* AI Tools Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-yellow-500" />
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-yellow-400" />
             AI Tools & Features
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Character Chat Tool */}
-            <Card 
-              className="shadow-lg border-0 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.03] cursor-pointer"
+            <Card
+              className="shadow-lg border border-purple-500/30 bg-gradient-to-br from-purple-900/40 to-pink-900/40 backdrop-blur-md hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-300 hover:scale-[1.05] hover:border-purple-400/50 cursor-pointer group"
               onClick={() => router.push('/character-chat')}
             >
               <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition-all duration-300">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Character Chat</h3>
-                <p className="text-xs text-gray-600">Chat with AI characters</p>
+                <h3 className="font-semibold text-white mb-1">Character Chat</h3>
+                <p className="text-xs text-purple-200/70">Chat with AI characters</p>
               </CardContent>
             </Card>
 
             {/* Course Guidance Tool */}
-            <Card 
-              className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-cyan-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.03] cursor-pointer"
+            <Card
+              className="shadow-lg border border-blue-500/30 bg-gradient-to-br from-blue-900/40 to-cyan-900/40 backdrop-blur-md hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all duration-300 hover:scale-[1.05] hover:border-blue-400/50 cursor-pointer group"
               onClick={() => router.push('/course-guidance')}
             >
               <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all duration-300">
                   <GraduationCap className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Course Guidance</h3>
-                <p className="text-xs text-gray-600">Generate AI courses</p>
+                <h3 className="font-semibold text-white mb-1">Course Guidance</h3>
+                <p className="text-xs text-blue-200/70">Generate AI courses</p>
               </CardContent>
             </Card>
 
             {/* Database Chat Tool */}
-            <Card 
-              className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.03] cursor-pointer"
+            <Card
+              className="shadow-lg border border-green-500/30 bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-md hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] transition-all duration-300 hover:scale-[1.05] hover:border-green-400/50 cursor-pointer group"
               onClick={() => router.push('/db-chat')}
             >
               <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all duration-300">
                   <Database className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Database Chat</h3>
-                <p className="text-xs text-gray-600">Query your database</p>
+                <h3 className="font-semibold text-white mb-1">Database Chat</h3>
+                <p className="text-xs text-green-200/70">Query your database</p>
               </CardContent>
             </Card>
 
             {/* Summarizer Tool */}
-            <Card 
-              className="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-red-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.03] cursor-pointer"
+            <Card
+              className="shadow-lg border border-orange-500/30 bg-gradient-to-br from-orange-900/40 to-red-900/40 backdrop-blur-md hover:shadow-[0_0_30px_rgba(249,115,22,0.4)] transition-all duration-300 hover:scale-[1.05] hover:border-orange-400/50 cursor-pointer group"
               onClick={() => router.push('/summarizer')}
             >
               <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-[0_0_20px_rgba(249,115,22,0.5)] transition-all duration-300">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Summarizer</h3>
-                <p className="text-xs text-gray-600">Summarize content</p>
+                <h3 className="font-semibold text-white mb-1">Summarizer</h3>
+                <p className="text-xs text-orange-200/70">Summarize content</p>
               </CardContent>
             </Card>
 
             {/* Flowchart Generator Tool */}
-            <Card 
-              className="shadow-lg border-0 bg-gradient-to-br from-yellow-50 to-orange-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.03] cursor-pointer"
+            <Card
+              className="shadow-lg border border-yellow-500/30 bg-gradient-to-br from-yellow-900/40 to-orange-900/40 backdrop-blur-md hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] transition-all duration-300 hover:scale-[1.05] hover:border-yellow-400/50 cursor-pointer group"
               onClick={() => router.push('/flowchart-generator')}
             >
               <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-[0_0_20px_rgba(234,179,8,0.5)] transition-all duration-300">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Flowchart Generator</h3>
-                <p className="text-xs text-gray-600">Create visual flowcharts</p>
+                <h3 className="font-semibold text-white mb-1">Flowchart Generator</h3>
+                <p className="text-xs text-yellow-200/70">Create visual flowcharts</p>
               </CardContent>
             </Card>
           </div>
@@ -699,35 +470,35 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Chat Interface */}
           <div className="lg:col-span-2">
-            <Card className="h-[calc(100vh-200px)] flex flex-col shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="h-[calc(100vh-200px)] flex flex-col shadow-2xl border border-white/10 bg-black/50 backdrop-blur-xl rounded-2xl overflow-hidden">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-5 h-5 text-indigo-600" />
-                    <CardTitle className="text-xl">Chat Interface</CardTitle>
+                    <CardTitle className="text-xl text-white">Chat Interface</CardTitle>
                   </div>
-                  <Badge variant="secondary" className="bg-indigo-100 text-indigo-700">
+                  <Badge variant="secondary" className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
                     {chatHistory.length} messages
                   </Badge>
                 </div>
-                <CardDescription>Ask questions to different AI engines</CardDescription>
+                <CardDescription className="text-indigo-300/60">Ask questions to different AI engines</CardDescription>
               </CardHeader>
-              
+
               {/* Chat Messages */}
               <div className="flex-1 overflow-hidden">
                 <ScrollArea className="h-full px-6">
-                  <div className="space-y-6 py-4">
+                  <div className="flex flex-col justify-end min-h-full space-y-6 py-4">
                     {chatHistory.length === 0 ? (
-                      <div className="text-center text-muted-foreground py-16 bounce-in">
-                        <div className="w-24 h-24 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 float-animation">
-                          <Bot className="w-12 h-12 text-indigo-600" />
+                      <div className="text-center text-indigo-300/70 py-16 bounce-in">
+                        <div className="w-24 h-24 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <Bot className="w-12 h-12 text-indigo-400" />
                         </div>
-                        <h3 className="text-lg font-medium mb-2">Start a conversation</h3>
+                        <h3 className="text-lg font-medium mb-2 text-white">Start a conversation</h3>
                         <p className="text-sm">Ask your first question to begin chatting with AI</p>
                       </div>
                     ) : (
                       chatHistory.filter(chat => chat && chat.id).map((chat, index) => (
-                        <div key={chat.id} className="space-y-4" style={{animationDelay: `${index * 0.1}s`}}>
+                        <div key={chat.id} className="space-y-4" style={{ animationDelay: `${index * 0.1}s` }}>
                           {/* User Message */}
                           <div className="flex gap-3 slide-in-right message-hover">
                             <Avatar className="w-8 h-8 flex-shrink-0">
@@ -742,8 +513,8 @@ export default function Home() {
                                   {chat.timestamp ? new Date(chat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                 </span>
                               </div>
-                              <div className="bg-indigo-50 rounded-2xl rounded-tl-sm px-4 py-3 inline-block max-w-full message-hover">
-                                <p className="text-sm text-gray-800">{chat.question || 'No question'}</p>
+                              <div className="bg-indigo-500/20 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] message-hover">
+                                <p className="text-sm text-indigo-100 break-words">{chat.question || 'No question'}</p>
                               </div>
                             </div>
                             <Button
@@ -757,7 +528,7 @@ export default function Home() {
                           </div>
 
                           {/* AI Response */}
-                          <div className="flex gap-3 slide-in-left message-hover" style={{animationDelay: `${index * 0.1 + 0.2}s`}}>
+                          <div className="flex gap-3 slide-in-left message-hover" style={{ animationDelay: `${index * 0.1 + 0.2}s` }}>
                             <Avatar className="w-8 h-8 flex-shrink-0">
                               <AvatarFallback className="bg-purple-100 text-purple-600">
                                 <Bot className="w-4 h-4" />
@@ -770,8 +541,8 @@ export default function Home() {
                                   {getModelIcon(chat.engine)} {getModelName(chat.engine)}
                                 </Badge>
                               </div>
-                              <div className="bg-purple-50 rounded-2xl rounded-tl-sm px-4 py-3 inline-block max-w-full message-hover">
-                                <p className="text-sm text-gray-800 whitespace-pre-wrap">{chat.answer || 'No response received'}</p>
+                              <div className="bg-purple-500/20 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] message-hover">
+                                <p className="text-sm text-purple-100 whitespace-pre-wrap break-words">{chat.answer || 'No response received'}</p>
                               </div>
                             </div>
                           </div>
@@ -784,12 +555,12 @@ export default function Home() {
               </div>
 
               {/* Input Section - Fixed */}
-              <div className="border-t bg-gray-50 p-4 transition-all duration-300">
+              <div className="border-t border-white/10 bg-gradient-to-r from-black/40 via-indigo-950/20 to-black/40 p-5 transition-all duration-300">
                 <div className="space-y-3">
                   {/* Model Selection */}
                   <div className="flex flex-wrap gap-3 items-center">
                     <Select value={selectedEngine} onValueChange={setSelectedEngine}>
-                      <SelectTrigger className="w-72 h-10 bg-white border-gray-200 transition-all duration-300 hover:border-indigo-300 hover:shadow-md focus:ring-indigo-500">
+                      <SelectTrigger className="w-72 h-11 bg-white/5 border-white/20 text-white rounded-xl transition-all duration-300 hover:border-indigo-400/50 hover:bg-white/10 focus:ring-indigo-500">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -804,20 +575,20 @@ export default function Home() {
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                    
+
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         id="use-history"
                         checked={useHistory}
                         onChange={(e) => setUseHistory(e.target.checked)}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 transition-all duration-200 hover:scale-110"
+                        className="rounded border-indigo-500/50 text-indigo-400 focus:ring-indigo-500 transition-all duration-200 hover:scale-110 bg-transparent"
                       />
-                      <Label htmlFor="use-history" className="text-sm font-medium cursor-pointer transition-colors hover:text-indigo-600">Use History</Label>
+                      <Label htmlFor="use-history" className="text-sm font-medium cursor-pointer transition-colors hover:text-indigo-300 text-indigo-200/80">Use History</Label>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
-                      <Label htmlFor="max-history" className="text-sm font-medium">Max History:</Label>
+                      <Label htmlFor="max-history" className="text-sm font-medium text-indigo-200/80">Max History:</Label>
                       <Input
                         id="max-history"
                         type="number"
@@ -825,11 +596,11 @@ export default function Home() {
                         max="50"
                         value={maxHistory}
                         onChange={(e) => setMaxHistory(parseInt(e.target.value) || 10)}
-                        className="w-16 h-10 border-gray-200 transition-all duration-300 hover:border-indigo-300 focus:ring-indigo-500"
+                        className="w-16 h-10 border-white/20 bg-white/5 text-white transition-all duration-300 hover:border-indigo-400/50 focus:ring-indigo-500"
                       />
                     </div>
                   </div>
-                  
+
                   {/* Message Input */}
                   <div className="flex gap-2">
                     <Textarea
@@ -842,12 +613,12 @@ export default function Home() {
                           handleSendMessage()
                         }
                       }}
-                      className="flex-1 min-h-[60px] max-h-[120px] resize-none border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 bg-white transition-all duration-300 focus:scale-[1.01] focus:shadow-lg"
+                      className="flex-1 min-h-[60px] max-h-[120px] resize-none border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:border-indigo-500 focus:ring-indigo-500 rounded-xl transition-all duration-300 focus:bg-white/10 focus:shadow-lg"
                     />
-                    <Button 
-                      onClick={handleSendMessage} 
+                    <Button
+                      onClick={handleSendMessage}
                       disabled={isLoading || !currentMessage.trim()}
-                      className="px-6 h-[60px] bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg transition-all duration-300 hover:scale-[1.05] hover:shadow-xl active:scale-[0.95] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-8 h-[60px] bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white shadow-lg shadow-indigo-500/30 rounded-xl transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-purple-500/30 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
@@ -871,24 +642,24 @@ export default function Home() {
 
           {/* History Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="h-[calc(100vh-200px)] flex flex-col shadow-xl border-0 bg-white/80 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl">
+            <Card className="h-[calc(100vh-200px)] flex flex-col shadow-2xl border border-white/10 bg-black/50 backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_40px_rgba(99,102,241,0.15)]">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <History className="w-5 h-5 text-indigo-600 transition-transform duration-300 hover:scale-110" />
-                    <CardTitle className="text-xl">Chat History</CardTitle>
+                    <CardTitle className="text-xl text-white">Chat History</CardTitle>
                   </div>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={deleteHistory}
                     disabled={chatHistory.length === 0}
-                    className="text-gray-500 hover:text-red-500 hover:bg-red-50 border-gray-200 transition-all duration-300 hover:scale-[1.05]"
+                    className="text-indigo-300/60 hover:text-red-400 hover:bg-red-500/10 border-white/20 transition-all duration-300 hover:scale-[1.05]"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-indigo-300/60">
                   {chatHistory.length} conversation{chatHistory.length !== 1 ? 's' : ''}
                 </CardDescription>
               </CardHeader>
@@ -896,17 +667,17 @@ export default function Home() {
                 <ScrollArea className="h-full px-4">
                   <div className="space-y-3 py-4">
                     {chatHistory.length === 0 ? (
-                      <div className="text-center text-muted-foreground py-8 bounce-in">
+                      <div className="text-center text-indigo-300/60 py-8 bounce-in">
                         <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
                         <p className="text-sm">No chat history yet</p>
                         <p className="text-xs mt-1">Start chatting to see your history</p>
                       </div>
                     ) : (
                       chatHistory.filter(chat => chat && chat.id).map((chat, index) => (
-                        <Card key={chat.id} className="p-4 hover:shadow-md transition-all duration-300 hover:scale-[1.02] cursor-pointer border-0 bg-gradient-to-r from-gray-50 to-white message-hover" style={{animationDelay: `${index * 0.1}s`}}>
+                        <Card key={chat.id} className="p-4 hover:shadow-md transition-all duration-300 hover:scale-[1.02] cursor-pointer border border-white/10 bg-white/5 message-hover overflow-hidden" style={{ animationDelay: `${index * 0.1}s` }}>
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                              <Badge variant="secondary" className="text-xs bg-gradient-to-r from-indigo-50 to-purple-50 border-0">
+                              <Badge variant="secondary" className="text-xs bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border-0 text-indigo-300">
                                 {getModelIcon(chat.engine)} {getModelName(chat.engine)}
                               </Badge>
                               <Button
@@ -919,14 +690,14 @@ export default function Home() {
                               </Button>
                             </div>
                             <div className="space-y-2">
-                              <p className="text-sm font-medium text-gray-800 line-clamp-2 leading-relaxed">
+                              <p className="text-sm font-medium text-white line-clamp-2 leading-relaxed break-words">
                                 {chat.question || 'No question'}
                               </p>
-                              <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                              <p className="text-xs text-indigo-200/60 line-clamp-2 leading-relaxed break-words">
                                 {chat.answer || 'No response'}
                               </p>
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1 text-xs text-indigo-300/50">
                               <Clock className="w-3 h-3" />
                               {chat.timestamp ? new Date(chat.timestamp).toLocaleString() : 'No timestamp'}
                             </div>
@@ -941,6 +712,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-    </div>
+    </div >
   )
 }

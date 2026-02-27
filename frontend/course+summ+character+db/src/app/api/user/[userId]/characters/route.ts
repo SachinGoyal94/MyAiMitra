@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await params
-    
+
     // Forward request to real backend
     try {
       const response = await fetch(`${BACKEND_URL}/user/${userId}/characters`, {
@@ -17,14 +17,14 @@ export async function GET(
           'Content-Type': 'application/json',
         },
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         return NextResponse.json(data)
       } else {
         throw new Error(`Backend returned ${response.status}`)
       }
-    } catch (backendError) {
+    } catch (backendError: any) {
       console.log('Backend unavailable:', backendError.message)
       return NextResponse.json(
         { error: 'Backend unavailable. Please try again later.' },

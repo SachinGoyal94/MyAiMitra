@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Mock user database - in a real app, this would be in a database
-const mockUsers = new Map([
-  ['gogo', 1],
-  ['test', 2],
-  ['demo', 3],
-  ['mera', 20]  // Update mera to match external backend user ID
-])
+const BACKEND_URL = 'https://persona-flow-zqxz.onrender.com'
 
 export async function GET(
   request: NextRequest,
@@ -14,29 +8,42 @@ export async function GET(
 ) {
   try {
     const { username } = await params
-    
+
     if (!username) {
       return NextResponse.json(
         { error: 'Username is required' },
         { status: 400 }
       )
     }
-    
-    // Get user ID from mock database
-    const userId = mockUsers.get(username)
-    
-    if (!userId) {
-      // For specific usernames we know, return consistent IDs
-      if (username === 'mera') {
-        return NextResponse.json({ user_id: 20 })
+
+    // Call the real backend to get user ID
+    try {
+      const response = await fetch(`${BACKEND_URL}/get_user_id/${encodeURIComponent(username)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log(`Got user_id for ${username}:`, data)
+        return NextResponse.json(data)
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Backend error getting user ID:', errorData)
+        return NextResponse.json(
+          { error: errorData.detail || `User not found (${response.status})` },
+          { status: response.status }
+        )
       }
-      // Create a new user ID for other unknown usernames
-      const newUserId = Date.now()
-      mockUsers.set(username, newUserId)
-      return NextResponse.json({ user_id: newUserId })
+    } catch (backendError: any) {
+      console.error('Backend unavailable:', backendError.message)
+      return NextResponse.json(
+        { error: 'Backend unavailable. Please try again later.' },
+        { status: 503 }
+      )
     }
-    
-    return NextResponse.json({ user_id: userId })
   } catch (error) {
     console.error('Error getting user ID:', error)
     return NextResponse.json(

@@ -8,28 +8,26 @@ export async function GET(
 ) {
   try {
     const { userId, personaId } = await params
-    
-    // Try to forward the request to the external backend
-    try {
-      const response = await fetch(`${BACKEND_URL}/history/${userId}/${personaId}`)
-      
-      if (response.ok) {
-        const data = await response.json()
-        return NextResponse.json(data)
-      } else {
-        throw new Error('Backend error')
-      }
-    } catch (backendError) {
-      console.log('Backend unavailable, returning empty history')
-      
-      // Fallback: Return empty history
-      return NextResponse.json([])
+
+    // Forward the request to the external backend
+    const response = await fetch(`${BACKEND_URL}/history/${userId}/${personaId}`)
+
+    if (response.ok) {
+      const data = await response.json()
+      return NextResponse.json(data)
+    } else {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('Backend error:', errorData)
+      return NextResponse.json(
+        { error: errorData.detail || errorData.error || `Failed to get history (${response.status})` },
+        { status: response.status }
+      )
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error getting chat history:', error)
     return NextResponse.json(
-      { error: 'Failed to get chat history' },
-      { status: 500 }
+      { error: error.message || 'Failed to get chat history. Backend may be unavailable.' },
+      { status: 503 }
     )
   }
 }

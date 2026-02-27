@@ -69,10 +69,9 @@ export default function CharacterChat() {
       if (userData) {
         setUser(JSON.parse(userData))
       } else {
-        // For demo purposes, create a mock user if no user exists
-        const mockUser = { username: 'Demo User', userId: 20 }
-        setUser(mockUser)
-        localStorage.setItem('user', JSON.stringify(mockUser))
+        // Redirect to home page if not logged in
+        router.push('/')
+        return
       }
       setIsCheckingAuth(false)
     }
@@ -87,9 +86,9 @@ export default function CharacterChat() {
 
   const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     const url = `${API_BASE}/api${endpoint}`
-    
+
     try {
-      const response = await fetch(url, { 
+      const response = await fetch(url, {
         method: options.method || 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -97,12 +96,12 @@ export default function CharacterChat() {
         },
         body: options.body,
       })
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(errorData.error || errorData.detail || `HTTP ${response.status}`)
       }
-      
+
       return await response.json()
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Network error')
@@ -110,52 +109,49 @@ export default function CharacterChat() {
   }
 
   const getUserId = async (username: string) => {
-    try {
-      console.log('Getting user ID for:', username)
-      const response = await apiCall(`/get_user_id/${username}`)
-      console.log('User ID response:', response)
-      return response.user_id
-    } catch (err) {
-      console.error('Failed to get user ID:', err)
-      // For demo purposes, return a mock user ID that has characters
-      console.log('Using mock user ID: 20')
-      return 20
-    }
+    console.log('Getting user ID for:', username)
+    const response = await apiCall(`/get_user_id/${encodeURIComponent(username)}`)
+    console.log('User ID response:', response)
+    return response.user_id
   }
 
   const loadUserId = async () => {
     if (!user) return
-    
+
     // If userId is already set, don't fetch again
     if (user.userId) {
       loadPersonas(user.userId)
       return
     }
-    
+
     try {
       console.log('Loading user ID for user:', user)
       const userId = await getUserId(user.username)
       console.log('Got user ID:', userId)
       if (userId) {
-        setUser(prev => prev ? { ...prev, userId } : null)
+        // Update user state and save to localStorage
+        const updatedUser = { ...user, userId }
+        setUser(updatedUser)
+        localStorage.setItem('user', JSON.stringify(updatedUser))
         console.log('Loading personas for user ID:', userId)
         loadPersonas(userId)
+      } else {
+        setError('User not found. Please log in again.')
       }
     } catch (err) {
       console.error('Failed to load user ID:', err)
-      // Continue with mock data for demo - use user ID 20 which has characters
-      console.log('Loading personas for mock user ID: 20')
-      loadPersonas(20)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load user'
+      setError(`${errorMessage}. Please try logging in again.`)
     }
   }
 
   const loadPersonas = async (userId?: number) => {
     try {
       if (!userId) return
-      
+
       console.log('Loading personas for user ID:', userId)
-      const personas = await apiCall(`/user/${userId}/characters`)
-      const mappedPersonas = personas.characters?.map((p: any) => ({
+      const response = await apiCall(`/user/${userId}/characters`)
+      const mappedPersonas = response.characters?.map((p: any) => ({
         id: p.persona_id,
         character_name: p.character_name,
         mode: p.mode,
@@ -163,43 +159,12 @@ export default function CharacterChat() {
         summary: p.summary,
         created_at: p.created_at
       })) || []
+      console.log('Loaded personas:', mappedPersonas)
       setPersonas(mappedPersonas)
     } catch (err) {
       console.error('Failed to load personas:', err)
-      // Load mock personas for demo - try user ID 20 which we know has characters
-      try {
-        const fallbackPersonas = await apiCall(`/user/20/characters`)
-        const mappedFallbackPersonas = fallbackPersonas.characters?.map((p: any) => ({
-          id: p.persona_id,
-          character_name: p.character_name,
-          mode: p.mode,
-          tone: p.tone,
-          summary: p.summary,
-          created_at: p.created_at
-        })) || []
-        setPersonas(mappedFallbackPersonas)
-      } catch (fallbackErr) {
-        console.error('Fallback also failed, loading static mock personas')
-        const staticMockPersonas: Persona[] = [
-          {
-            id: 65,
-            character_name: 'Sunil gavaskar',
-            mode: 'auto',
-            tone: 'neutral',
-            summary: 'Legendary Indian cricketer known for his technical batting skills',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 37,
-            character_name: 'dhoni',
-            mode: 'auto',
-            tone: 'neutral',
-            summary: 'Mahendra Singh Dhoni - Former Indian cricket captain known for his calm demeanor and leadership',
-            created_at: new Date().toISOString()
-          }
-        ]
-        setPersonas(staticMockPersonas)
-      }
+      // Just set empty personas - user can create new ones
+      setPersonas([])
     }
   }
 
@@ -222,7 +187,7 @@ export default function CharacterChat() {
       formData.append('username', user.username)
       formData.append('mode', mode)
       formData.append('tone', tone)
-      
+
       if (mode === 'auto') {
         formData.append('character_name', characterName)
       } else {
@@ -244,7 +209,7 @@ export default function CharacterChat() {
 
       const data = await response.json()
       console.log('Create persona response:', data)
-      
+
       const newPersona: Persona = {
         id: data.persona_id,
         character_name: data.character_name,
@@ -258,12 +223,12 @@ export default function CharacterChat() {
       setPersonas(prev => [...prev, newPersona])
       setSelectedPersona(newPersona)
       setShowCreatePersona(false)
-      
+
       // Reset form
       setCharacterName('')
       setCustomPrompt('')
       setTone('neutral')
-      
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create persona'
       console.error('Create persona error:', err)
@@ -274,17 +239,17 @@ export default function CharacterChat() {
   }
 
   const sendMessage = async () => {
-    if (!currentMessage.trim() || !selectedPersona || !user) return
+    if (!currentMessage.trim() || !selectedPersona || !user || !user.userId) return
 
     setIsLoading(true)
     setError(null)
 
     try {
       const formData = new FormData()
-      formData.append('user_id', (user as any).userId?.toString() || '1')
+      formData.append('user_id', user.userId!.toString())
       formData.append('persona_id', selectedPersona.id.toString())
       formData.append('user_message', currentMessage)
-      formData.append('max_history', '20')
+      formData.append('max_history', '15')
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -297,7 +262,7 @@ export default function CharacterChat() {
       }
 
       const data = await response.json()
-      
+
       // Add user message
       const userMessage: CharacterMessage = {
         id: Date.now(),
@@ -316,7 +281,7 @@ export default function CharacterChat() {
 
       setMessages(prev => [...prev, userMessage, agentMessage])
       setCurrentMessage('')
-      
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send message'
       setError(`${errorMessage}. The backend server may be unavailable.`)
@@ -326,14 +291,13 @@ export default function CharacterChat() {
   }
 
   const loadChatHistory = async () => {
-    if (!selectedPersona || !user) return
+    if (!selectedPersona || !user || !user.userId) return
 
     try {
-      const userId = (user as any).userId || 1
-      console.log('Loading chat history for user:', userId, 'persona:', selectedPersona.id)
-      const history = await apiCall(`/history/${userId}/${selectedPersona.id}`)
+      console.log('Loading chat history for user:', user.userId, 'persona:', selectedPersona.id)
+      const history = await apiCall(`/history/${user.userId}/${selectedPersona.id}`)
       console.log('Chat history response:', history)
-      
+
       // Ensure we always set an array
       if (Array.isArray(history)) {
         setMessages(history)
@@ -350,11 +314,11 @@ export default function CharacterChat() {
   }
 
   const deletePersona = async (personaId: number) => {
-    if (!user) return
+    if (!user || !user.userId) return
 
     try {
       const formData = new FormData()
-      formData.append('user_id', (user as any).userId?.toString() || '20')
+      formData.append('user_id', user.userId.toString())
 
       const response = await fetch(`/api/character/${personaId}`, {
         method: 'DELETE',
@@ -371,7 +335,7 @@ export default function CharacterChat() {
         setSelectedPersona(null)
         setMessages([]) // Reset to empty array
       }
-      
+
       // Show success message
       console.log('Character deleted successfully')
     } catch (err) {
@@ -388,9 +352,12 @@ export default function CharacterChat() {
 
   const confirmDelete = async () => {
     if (personaToDelete) {
-      await deletePersona(personaToDelete.id)
+      const personaId = personaToDelete.id
+      // Close dialog immediately for better UX
       setDeleteConfirmOpen(false)
       setPersonaToDelete(null)
+      // Then perform delete in background
+      await deletePersona(personaId)
     }
   }
 
@@ -523,8 +490,8 @@ export default function CharacterChat() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleBackToMain}
                 className="flex items-center gap-2 border-gray-200 hover:bg-gray-50 transition-all duration-300 hover:scale-[1.02]"
               >
@@ -543,8 +510,8 @@ export default function CharacterChat() {
                 </p>
               </div>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 localStorage.removeItem('user')
                 setUser(null)
@@ -580,158 +547,166 @@ export default function CharacterChat() {
                     Create
                   </Button>
                 </div>
-          </CardHeader>
-          
-          <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-            {/* Create Character Modal */}
-            {showCreatePersona && (
-              <div 
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-                onClick={() => setShowCreatePersona(false)}
-              >
-                <div 
-                  className="bg-white rounded-lg shadow-xl max-w-[600px] w-full max-h-[80vh] overflow-hidden flex flex-col"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {/* Header */}
-                  <div className="flex items-center justify-between p-6 border-b">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-purple-600" />
-                      <h2 className="text-xl font-semibold">Create New Character</h2>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowCreatePersona(false)}
-                      className="h-8 w-8 p-0"
-                    >
-                      ×
-                    </Button>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    <p className="text-gray-600">
-                      Design a new AI character with specific personality traits and communication style.
-                    </p>
-                    
-                    <div>
-                      <Label htmlFor="mode">Mode</Label>
-                      <Select value={mode} onValueChange={(value: 'auto' | 'custom') => setMode(value)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="auto">Auto Character</SelectItem>
-                          <SelectItem value="custom">Custom Character</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+              </CardHeader>
 
-                    {mode === 'auto' ? (
-                      <div>
-                        <Label htmlFor="character-name">Character Name</Label>
-                        <Input
-                          id="character-name"
-                          value={characterName}
-                          onChange={(e) => setCharacterName(e.target.value)}
-                          placeholder="e.g., Sherlock Holmes"
-                        />
+              <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+                {/* Create Character Modal */}
+                {showCreatePersona && (
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+                    onClick={() => setShowCreatePersona(false)}
+                  >
+                    <div
+                      className="bg-white rounded-lg shadow-xl max-w-[600px] w-full max-h-[80vh] overflow-hidden flex flex-col"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between p-6 border-b">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-5 h-5 text-purple-600" />
+                          <h2 className="text-xl font-semibold">Create New Character</h2>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowCreatePersona(false)}
+                          className="h-8 w-8 p-0"
+                        >
+                          ×
+                        </Button>
                       </div>
-                    ) : (
-                      <>
-                      <div>
-                        <Label htmlFor="character-name">Character Name</Label>
-                        <Input
-                          id="character-name"
-                          value={characterName}
-                          onChange={(e) => setCharacterName(e.target.value)}
-                          placeholder="e.g., Mary, Friends Mom"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="custom-prompt">Custom Prompt</Label>
-                        <Textarea
-                          id="custom-prompt"
-                          value={customPrompt}
-                          onChange={(e) => setCustomPrompt(e.target.value)}
-                          placeholder="Describe your character's personality, background, and expertise..."
-                          className="min-h-[120px] max-h-[200px] resize-y overflow-y-auto custom-scrollbar"
-                          rows={6}
-                        />
-                      </div>
-                      </>
-                    )}
 
-                    <div>
-                      <Label htmlFor="tone">Tone</Label>
-                      <Select value={tone} onValueChange={setTone}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="neutral">Neutral</SelectItem>
-                          <SelectItem value="friendly">Friendly</SelectItem>
-                          <SelectItem value="professional">Professional</SelectItem>
-                          <SelectItem value="casual">Casual</SelectItem>
-                          <SelectItem value="humorous">Humorous</SelectItem>
-                          <SelectItem value="formal">Formal</SelectItem>
-                          <SelectItem value="matured">Matured</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {/* Content */}
+                      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                        <p className="text-gray-600">
+                          Design a new AI character with specific personality traits and communication style.
+                        </p>
+
+                        <div>
+                          <Label htmlFor="mode">Mode</Label>
+                          <Select value={mode} onValueChange={(value: 'auto' | 'custom') => setMode(value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="auto">Auto Character</SelectItem>
+                              <SelectItem value="custom">Custom Character</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {mode === 'auto' ? (
+                          <div>
+                            <Label htmlFor="character-name">Character Name</Label>
+                            <Input
+                              id="character-name"
+                              value={characterName}
+                              onChange={(e) => setCharacterName(e.target.value)}
+                              placeholder="e.g., Sherlock Holmes"
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <div>
+                              <Label htmlFor="character-name">Character Name</Label>
+                              <Input
+                                id="character-name"
+                                value={characterName}
+                                onChange={(e) => setCharacterName(e.target.value)}
+                                placeholder="e.g., Mary, Friends Mom"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="custom-prompt">Custom Prompt</Label>
+                              <Textarea
+                                id="custom-prompt"
+                                value={customPrompt}
+                                onChange={(e) => setCustomPrompt(e.target.value)}
+                                placeholder="Describe your character's personality, background, and expertise..."
+                                className="min-h-[120px] max-h-[200px] resize-y overflow-y-auto custom-scrollbar"
+                                rows={6}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        <div>
+                          <Label htmlFor="tone">Tone</Label>
+                          <p className="text-xs text-gray-500 mb-2">Select a preset or type your own custom tone</p>
+                          <Input
+                            id="tone"
+                            value={tone}
+                            onChange={(e) => setTone(e.target.value)}
+                            placeholder="Type a custom tone or select below..."
+                            className="mb-3"
+                          />
+                          <div className="flex flex-wrap gap-2">
+                            {['neutral', 'friendly', 'professional', 'casual', 'humorous', 'formal', 'matured', 'sarcastic', 'enthusiastic', 'calm'].map((presetTone) => (
+                              <Badge
+                                key={presetTone}
+                                variant={tone === presetTone ? 'default' : 'outline'}
+                                className={`cursor-pointer capitalize transition-all duration-200 hover:scale-105 ${tone === presetTone
+                                  ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-transparent'
+                                  : 'hover:bg-purple-100 hover:border-purple-300'
+                                  }`}
+                                onClick={() => setTone(presetTone)}
+                              >
+                                {presetTone}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+
+                        {error && (
+                          <Alert className="border-red-200 bg-red-50">
+                            <AlertTriangle className="w-4 h-4 text-red-600" />
+                            <AlertDescription className="text-red-700">
+                              {error}
+                            </AlertDescription>
+                          </Alert>
+                        )}
+                      </div>
+
+                      {/* Footer */}
+                      <div className="flex gap-3 p-6 border-t bg-gray-50">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowCreatePersona(false)}
+                          disabled={isLoading}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={createPersona}
+                          disabled={isLoading || !characterName.trim() || (mode === 'custom' && !customPrompt.trim())}
+                          className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Creating...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Create Character
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
-
-                    {error && (
-                      <Alert className="border-red-200 bg-red-50">
-                        <AlertTriangle className="w-4 h-4 text-red-600" />
-                        <AlertDescription className="text-red-700">
-                          {error}
-                        </AlertDescription>
-                      </Alert>
-                    )}
                   </div>
-                  
-                  {/* Footer */}
-                  <div className="flex gap-3 p-6 border-t bg-gray-50">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowCreatePersona(false)}
-                      disabled={isLoading}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={createPersona}
-                      disabled={isLoading || !characterName.trim() || (mode === 'custom' && !customPrompt.trim())}
-                      className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Creating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4 mr-2" />
-                          Create Character
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-            <ScrollArea className="flex-1 min-h-0 custom-scrollbar">
+                )}
+                <ScrollArea className="flex-1 min-h-0 custom-scrollbar">
                   <div className="space-y-3 p-4">
                     {personas.map((persona) => (
                       <Card
                         key={persona.id}
-                        className={`cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
-                          selectedPersona?.id === persona.id
-                            ? 'ring-2 ring-purple-500 bg-purple-50'
-                            : 'hover:bg-gray-50'
-                        }`}
+                        className={`cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${selectedPersona?.id === persona.id
+                          ? 'ring-2 ring-purple-500 bg-purple-50'
+                          : 'hover:bg-gray-50'
+                          }`}
                         onClick={() => setSelectedPersona(persona)}
                       >
                         <CardContent className="p-4">
@@ -798,16 +773,14 @@ export default function CharacterChat() {
                           Array.isArray(messages) && messages.map((message) => (
                             <div
                               key={message.id}
-                              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} ${
-                                message.sender === 'user' ? 'slide-in-right' : 'slide-in-left'
-                              }`}
+                              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} ${message.sender === 'user' ? 'slide-in-right' : 'slide-in-left'
+                                }`}
                             >
                               <div
-                                className={`max-w-[80%] p-3 rounded-2xl message-hover ${
-                                  message.sender === 'user'
-                                    ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white'
-                                    : 'bg-gray-100 text-gray-900'
-                                }`}
+                                className={`max-w-[80%] p-3 rounded-2xl message-hover ${message.sender === 'user'
+                                  ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white'
+                                  : 'bg-gray-100 text-gray-900'
+                                  }`}
                               >
                                 <div className="flex items-center gap-2 mb-1">
                                   {message.sender === 'user' ? (
@@ -834,24 +807,24 @@ export default function CharacterChat() {
                     {/* Fixed Input Area */}
                     <div className="border-t bg-white p-4 flex-shrink-0">
                       <div className="flex gap-2">
-                      <Input
-                        value={currentMessage}
-                        onChange={(e) => setCurrentMessage(e.target.value)}
-                        placeholder={`Message ${selectedPersona.character_name}...`}
-                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                        className="flex-1 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
-                      />
-                      <Button
-                        onClick={sendMessage}
-                        disabled={isLoading || !currentMessage.trim()}
-                        className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Send className="w-4 h-4" />
-                        )}
-                      </Button>
+                        <Input
+                          value={currentMessage}
+                          onChange={(e) => setCurrentMessage(e.target.value)}
+                          placeholder={`Message ${selectedPersona.character_name}...`}
+                          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                          className="flex-1 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                        />
+                        <Button
+                          onClick={sendMessage}
+                          disabled={isLoading || !currentMessage.trim()}
+                          className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white"
+                        >
+                          {isLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Send className="w-4 h-4" />
+                          )}
+                        </Button>
                       </div>
                     </div>
                   </>
@@ -884,7 +857,7 @@ export default function CharacterChat() {
                 Delete Character
               </DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete <strong>{personaToDelete?.character_name}</strong>? 
+                Are you sure you want to delete <strong>{personaToDelete?.character_name}</strong>?
                 This action cannot be undone and will also delete all chat history with this character.
               </DialogDescription>
             </DialogHeader>

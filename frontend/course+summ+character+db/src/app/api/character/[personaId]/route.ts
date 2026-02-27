@@ -9,33 +9,29 @@ export async function DELETE(
   try {
     const { personaId } = await params
     const formData = await request.formData()
-    
+
     // Forward request to real backend
-    try {
-      const response = await fetch(`${BACKEND_URL}/character/${personaId}`, {
-        method: 'DELETE',
-        body: formData
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        return NextResponse.json(data)
-      } else {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || `Backend returned ${response.status}`)
-      }
-    } catch (backendError) {
-      console.log('Backend unavailable:', backendError.message)
+    const response = await fetch(`${BACKEND_URL}/character/${personaId}`, {
+      method: 'DELETE',
+      body: formData
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      return NextResponse.json(data)
+    } else {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('Backend error:', errorData)
       return NextResponse.json(
-        { error: 'Backend unavailable. Please try again later.' },
-        { status: 503 }
+        { error: errorData.detail || errorData.error || `Failed to delete character (${response.status})` },
+        { status: response.status }
       )
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting persona:', error)
     return NextResponse.json(
-      { error: 'Failed to delete persona' },
-      { status: 500 }
+      { error: error.message || 'Failed to delete character. Backend may be unavailable.' },
+      { status: 503 }
     )
   }
 }
