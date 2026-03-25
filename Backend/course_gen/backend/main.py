@@ -630,7 +630,6 @@ async def generate_course(request: CourseRequest):
             detail=f"Error generating course: {str(e)}"
         )
 
-
 if __name__ == "__main__":
     import uvicorn
 

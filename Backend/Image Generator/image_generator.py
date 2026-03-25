@@ -9,7 +9,6 @@ sdk = Bytez(key)
 # choose stable-diffusion-xl-base-1.0
 model = sdk.model("stabilityai/stable-diffusion-xl-base-1.0")
 
-# send input to model
 output= model.run("a rafale fighter jet launching a bramhos ")
 
 print(output)
