@@ -1,0 +1,51 @@
+name: Sync Backends to Hugging Face
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sync-spaces:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - folder: 'Backend/Chatbot'
+            space: 'SachinGoyal94/chatbot-space'
+          - folder: 'Backend/DB_Chat'
+            space: 'SachinGoyal94/db-chat-space'
+          - folder: 'Backend/Image Generator'
+            space: 'SachinGoyal94/image-gen-space'
+          - folder: 'Backend/Persona_Flow/backend'
+            space: 'SachinGoyal94/persona-flow-space'
+          - folder: 'Backend/Summarizer/backend'
+            space: 'SachinGoyal94/summarizer-space'
+          - folder: 'Backend/course_gen/backend'
+            space: 'SachinGoyal94/course-gen-space'
+          - folder: 'Backend/flowchart_maker/mycode'
+            space: 'SachinGoyal94/flowchart-space'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Check for changes in ${{ matrix.folder }}
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            changed:
+              - '${{ matrix.folder }}/**'
+
+      - name: Sync to Hugging Face Hub
+        if: steps.filter.outputs.changed == 'true'
+        uses: huggingface/hub-sync@main
+        with:
+          github_repo_id: ${{ github.repository }}
+          huggingface_repo_id: ${{ matrix.space }}
+          hf_token: ${{ secrets.HF_TOKEN }}
+          subdirectory: ${{ matrix.folder }}
