@@ -143,7 +143,7 @@ uvicorn main:app --host 0.0.0.0 --port 8004
 cd Backend/DB_Chat
 uvicorn main:app --host 0.0.0.0 --port 8005
 
-# Image Generator Service
+# Image_Generator Service
 cd Backend/Image\ Generator
 python image_generator.py
 ```

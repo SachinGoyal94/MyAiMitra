@@ -1,5 +1,5 @@
 ---
-title: Image Generator Backend
+title: Image_Generator Backend
 emoji: 🚀
 colorFrom: blue
 colorTo: green
