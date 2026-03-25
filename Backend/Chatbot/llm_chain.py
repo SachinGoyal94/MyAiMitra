@@ -14,7 +14,6 @@ groq_key = os.getenv("GROQ_KEY")
 os.environ["GROQ_API_KEY"] = groq_key
 gemini_api_key = os.getenv("GEMINI_KEY")
 
-# ✅ ENHANCED prompt with better conversation context
 prompt_with_history = ChatPromptTemplate.from_messages([
     ("system", """You are a helpful AI assistant with access to our conversation history. 
 
