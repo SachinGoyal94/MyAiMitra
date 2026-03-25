@@ -12,7 +12,7 @@ jobs:
       matrix:
         include:
           - folder: 'Backend/Chatbot'
-            space: 'SachinGoyal94/chatbot-space'
+            space: 'SachinGoyal94/MyAiMitra'
           - folder: 'Backend/DB_Chat'
             space: 'SachinGoyal94/db-chat-space'
           - folder: 'Backend/Image Generator'
