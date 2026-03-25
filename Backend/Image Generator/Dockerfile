@@ -16,7 +16,7 @@ RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.
 COPY . .
 
 # Expose port for FastAPI
-EXPOSE 8000
+EXPOSE 7860
 
 # Run the application (adjust if not using FastAPI)
 CMD ["python", "image_generator.py"]
