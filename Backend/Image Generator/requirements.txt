@@ -1,0 +1,14 @@
+python-dotenv
+pip
+setuptools
+validators
+requests
+datetime
+fastapi
+uvicorn
+pydantic
+langserve
+langchain_google_genai
+langchain_community
+unstructured
+bytez
