@@ -15,7 +15,7 @@ jobs:
             space: 'SachinGoyal94/MyAiMitra'
           - folder: 'Backend/DB_Chat'
             space: 'SachinGoyal94/db-chat-space'
-          - folder: 'Backend/Image Generator'
+          - folder: 'Backend/Image_Generator'
             space: 'SachinGoyal94/image-gen-space'
           - folder: 'Backend/Persona_Flow/backend'
             space: 'SachinGoyal94/persona-flow-space'
