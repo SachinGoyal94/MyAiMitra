@@ -14,7 +14,7 @@ if not gemini_key:
     raise ValueError("❌ GEMINI_KEY missing in .env file")
 
 gemini_llm = LLM(
-    model="gemini/gemini-2.5-flash-lite",
+    model="gemini/gemini-3.1-flash-lite-preview",
     api_key=gemini_key
 )
 

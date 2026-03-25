@@ -20,7 +20,7 @@ class ChatRequest(BaseModel):
 os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_KEY")
 
 try:
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
+    llm = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite-preview")
 except Exception as e:
     raise RuntimeError(f"❌ Failed to initialize ChatGroq: {e}")
 
