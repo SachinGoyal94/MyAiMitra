@@ -20,7 +20,7 @@ export default function FlowchartGenerator() {
   const [htmlContent, setHtmlContent] = useState<string | null>(null)
   const [flowchartId, setFlowchartId] = useState<string | null>(null)
 
-  const API_BASE_URL = 'https://flowchart-maker-dfmz.onrender.com'
+  const API_BASE_URL = 'https://sachingoyal94-flowchart-space.hf.space'
 
   const handleGenerateFlowchart = async () => {
     if (!input.trim()) {

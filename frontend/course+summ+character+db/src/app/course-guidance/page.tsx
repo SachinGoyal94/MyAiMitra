@@ -33,7 +33,7 @@ export default function CourseGuidancePage() {
   // Form state
   const [courseName, setCourseName] = useState('')
 
-  const API_BASE = 'https://course-gen.onrender.com'
+  const API_BASE = 'https://sachingoyal94-course-gen-space.hf.space'
 
   // Check backend status on component mount
   React.useEffect(() => {

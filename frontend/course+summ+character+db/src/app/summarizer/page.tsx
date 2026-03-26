@@ -64,7 +64,7 @@ export default function Summarizer() {
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('en')
   
-  const API_BASE = 'https://summarizer-8zkh.onrender.com'
+  const API_BASE = 'https://sachingoyal94-summarizer-space.hf.space'
   const API_TIMEOUT = 30000 // 30 seconds timeout
 
   // Helper function for API calls with timeout and error handling
