@@ -8,7 +8,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 load_dotenv()
-
+key = os.getenv("BYTEZ_API_KEY")
+sdk = Bytez(key)
 DEFAULT_MODEL_ID = "stabilityai/stable-diffusion-xl-base-1.0"
 
 app = FastAPI(title="Image_Generator Backend")

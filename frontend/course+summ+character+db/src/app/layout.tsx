@@ -14,33 +14,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nexagen Development Console",
+  title: "AI Mitra — Your AI Companion",
   description:
-    "A modern Next.js application engineered by the Nexagen Team using TypeScript, Tailwind CSS, and shadcn/ui.",
+    "Your intelligent companion for learning and creation. Chat with AI, generate courses, summarize documents, and more.",
   keywords: [
+    "AI Mitra",
+    "AI Assistant",
+    "Course Generator",
+    "Summarizer",
+    "Character Chat",
     "Next.js",
-    "TypeScript",
-    "Tailwind CSS",
-    "shadcn/ui",
-    "React",
-    "Nexagen Project",
   ],
-  authors: [{ name: "Nexagen Team" }],
+  authors: [{ name: "AI Mitra" }],
+  icons: {
+    icon: "/favicon.svg",
+  },
 
   openGraph: {
-    title: "Nexagen Dev Platform",
+    title: "AI Mitra",
     description:
-      "A React-based development interface crafted by the Nexagen engineering team.",
-    url: "https://nexagen-project.local",
-    siteName: "Nexagen",
+      "Your intelligent companion for learning and creation.",
+    siteName: "AI Mitra",
     type: "website",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Nexagen Dev Platform",
+    title: "AI Mitra",
     description:
-      "A modern engineering interface built using the React ecosystem.",
+      "Your intelligent companion for learning and creation.",
   },
 };
 
