@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Loader2, BookOpen, Target, FileText, HelpCircle, GraduationCap, TrendingUp, Award, Lightbulb, Bot, Wifi, WifiOff, Download, Copy, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import AuroraBackground from '@/components/ui/AuroraBackground'
 
 interface CourseData {
   course: string
@@ -33,7 +34,7 @@ export default function CourseGuidancePage() {
   // Form state
   const [courseName, setCourseName] = useState('')
 
-  const API_BASE = 'https://course-gen.onrender.com'
+  const API_BASE = 'https://sachingoyal94-course-gen-space.hf.space'
 
   // Check backend status on component mount
   React.useEffect(() => {
@@ -227,7 +228,9 @@ QUIZ: ${courseData.quiz}
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="min-h-screen relative overflow-hidden text-white">
+      <AuroraBackground />
+
       <style jsx>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
@@ -257,38 +260,38 @@ QUIZ: ${courseData.quiz}
         }
       `}</style>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto p-4 relative z-10">
         {/* Header */}
         <div className="text-center mb-8 slide-up">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg float-animation">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-4 shadow-[0_0_30px_rgba(59,130,246,0.4)] float-animation">
             <GraduationCap className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-indigo-200 bg-clip-text text-transparent mb-2">
             Course Guidance Tool
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-indigo-300/70">
             Generate personalized courses with skills analysis, content, and quizzes
           </p>
           <Button 
             variant="outline" 
             onClick={() => router.push('/')}
-            className="mt-4"
+            className="mt-4 border-white/20 text-white/70 bg-white/5 hover:bg-white/10"
           >
             ← Back to Home
           </Button>
         </div>
 
         {/* Input Form */}
-        <Card className="mb-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm slide-up">
+        <Card className="mb-8 shadow-2xl border border-white/10 bg-black/50 backdrop-blur-xl rounded-2xl slide-up">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="w-5 h-5 text-yellow-500" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Lightbulb className="w-5 h-5 text-yellow-400" />
               Course Generator
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-indigo-300/60">
               Enter a course name to generate a complete learning path. 
               {mockMode ? (
-                <span className="text-green-600 font-medium"> Mock Mode: Instant demo data for testing.</span>
+                <span className="text-green-400 font-medium"> Mock Mode: Instant demo data for testing.</span>
               ) : (
                 <span> Course generation takes 3-15 minutes as AI creates comprehensive content.</span>
               )}
@@ -296,13 +299,13 @@ QUIZ: ${courseData.quiz}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="courseName">Course Name *</Label>
+              <Label htmlFor="courseName" className="text-indigo-200">Course Name *</Label>
               <Input
                 id="courseName"
                 placeholder="e.g., Web Development, Data Science, Machine Learning"
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
-                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 text-lg h-12"
+                className="bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500 focus:ring-blue-500 text-lg h-12"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     generateCourse()
@@ -313,10 +316,10 @@ QUIZ: ${courseData.quiz}
             </div>
             
             {/* Mock Mode Toggle */}
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-lg">
               <div className="flex items-center gap-2">
-                <Bot className="w-4 h-4 text-gray-600" />
-                <span className="text-sm text-gray-700">
+                <Bot className="w-4 h-4 text-indigo-300" />
+                <span className="text-sm text-indigo-200/80">
                   {mockMode ? 'Mock Mode Active' : 'Live API Mode'}
                 </span>
               </div>
@@ -325,7 +328,7 @@ QUIZ: ${courseData.quiz}
                 size="sm"
                 onClick={() => setMockMode(!mockMode)}
                 disabled={isLoading}
-                className={`text-xs ${mockMode ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}
+                className={`text-xs ${mockMode ? 'bg-green-500/20 border-green-500/30 text-green-300' : 'bg-white/5 border-white/20 text-indigo-200/70'}`}
               >
                 {mockMode ? '✓ Mock' : 'Live API'}
               </Button>
@@ -333,20 +336,20 @@ QUIZ: ${courseData.quiz}
 
             {/* Backend Status */}
             {!mockMode && (
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-lg">
                 <div className="flex items-center gap-2">
                   {backendStatus === 'checking' ? (
-                    <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
+                    <Loader2 className="w-4 h-4 text-indigo-300 animate-spin" />
                   ) : backendStatus === 'online' ? (
-                    <Wifi className="w-4 h-4 text-green-600" />
+                    <Wifi className="w-4 h-4 text-green-400" />
                   ) : (
-                    <WifiOff className="w-4 h-4 text-red-600" />
+                    <WifiOff className="w-4 h-4 text-red-400" />
                   )}
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-indigo-200/80">
                     Backend Status: 
                     <span className={`ml-1 font-medium ${
-                      backendStatus === 'checking' ? 'text-gray-600' :
-                      backendStatus === 'online' ? 'text-green-600' : 'text-red-600'
+                      backendStatus === 'checking' ? 'text-indigo-300' :
+                      backendStatus === 'online' ? 'text-green-400' : 'text-red-400'
                     }`}>
                       {backendStatus === 'checking' ? ' Checking...' :
                        backendStatus === 'online' ? ' Online' : ' Offline'}
@@ -358,7 +361,7 @@ QUIZ: ${courseData.quiz}
                     variant="outline"
                     size="sm"
                     onClick={() => setMockMode(true)}
-                    className="text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                    className="text-xs bg-green-500/20 border-green-500/30 text-green-300 hover:bg-green-500/30"
                   >
                     Use Mock Mode
                   </Button>
@@ -370,12 +373,12 @@ QUIZ: ${courseData.quiz}
             {isLoading && (
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700">Generating course...</span>
-                  <span className="text-xs text-gray-500">{Math.round(progress)}%</span>
+                  <span className="text-sm font-medium text-indigo-200">Generating course...</span>
+                  <span className="text-xs text-indigo-300/60">{Math.round(progress)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
                   <div 
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-full rounded-full progress-bar transition-all duration-300"
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full progress-bar transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   ></div>
                 </div>
@@ -385,7 +388,7 @@ QUIZ: ${courseData.quiz}
             <Button 
               onClick={generateCourse} 
               disabled={isLoading || !courseName.trim()}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl h-12 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-medium shadow-lg shadow-indigo-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl h-12 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -404,8 +407,8 @@ QUIZ: ${courseData.quiz}
 
         {/* Error Alert */}
         {error && (
-          <Alert className="mb-6 border-red-200 bg-red-50 slide-up">
-            <AlertDescription className="text-red-700">
+          <Alert className="mb-6 border-red-500/30 bg-red-500/10 slide-up">
+            <AlertDescription className="text-red-300">
               {error}
               {!mockMode && (
                 <div className="mt-2">
@@ -413,7 +416,7 @@ QUIZ: ${courseData.quiz}
                     variant="outline"
                     size="sm"
                     onClick={() => setMockMode(true)}
-                    className="text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                    className="text-xs bg-green-500/20 border-green-500/30 text-green-300 hover:bg-green-500/30"
                   >
                     🚀 Enable Mock Mode for Instant Testing
                   </Button>
@@ -429,7 +432,7 @@ QUIZ: ${courseData.quiz}
             {/* Mock Mode Badge */}
             {mockMode && (
               <div className="flex items-center justify-center">
-                <Badge className="bg-green-100 text-green-800 border-green-200 px-3 py-1">
+                <Badge className="bg-green-500/20 text-green-300 border-green-500/30 px-3 py-1">
                   🎭 Mock Mode - Demo Data
                 </Badge>
               </div>
@@ -440,7 +443,7 @@ QUIZ: ${courseData.quiz}
               <Button
                 onClick={downloadCourseAsText}
                 variant="outline"
-                className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+                className="flex items-center gap-2 border-blue-500/30 text-blue-300 bg-blue-500/10 hover:bg-blue-500/20"
               >
                 <Download className="w-4 h-4" />
                 Download as Text
@@ -448,7 +451,7 @@ QUIZ: ${courseData.quiz}
               <Button
                 onClick={copyToClipboard}
                 variant="outline"
-                className="flex items-center gap-2 border-purple-200 text-purple-700 hover:bg-purple-50"
+                className="flex items-center gap-2 border-purple-500/30 text-purple-300 bg-purple-500/10 hover:bg-purple-500/20"
               >
                 {copied ? (
                   <>
@@ -465,36 +468,36 @@ QUIZ: ${courseData.quiz}
             </div>
             
             <Tabs defaultValue="course" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 bg-gray-100 p-1 rounded-xl">
-                <TabsTrigger value="course" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-4 bg-white/5 border border-white/10 p-1 rounded-xl">
+                <TabsTrigger value="course" className="flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70">
                   <BookOpen className="w-4 h-4" />
                   Course
                 </TabsTrigger>
-                <TabsTrigger value="skills" className="flex items-center gap-2">
+                <TabsTrigger value="skills" className="flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70">
                   <Target className="w-4 h-4" />
                   Skills
                 </TabsTrigger>
-                <TabsTrigger value="content" className="flex items-center gap-2">
+                <TabsTrigger value="content" className="flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70">
                   <FileText className="w-4 h-4" />
                   Content
                 </TabsTrigger>
-                <TabsTrigger value="quiz" className="flex items-center gap-2">
+                <TabsTrigger value="quiz" className="flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70">
                   <HelpCircle className="w-4 h-4" />
                   Quiz
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="course" className="space-y-4">
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
+                <Card className="shadow-2xl border border-blue-500/20 bg-gradient-to-br from-blue-900/30 to-indigo-900/30 backdrop-blur-xl rounded-2xl">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-blue-700">
+                    <CardTitle className="flex items-center gap-2 text-blue-300">
                       <BookOpen className="w-5 h-5" />
                       Course Overview
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <ScrollArea className="h-[400px] pr-4">
-                      <div className="whitespace-pre-wrap text-gray-700">
+                      <div className="whitespace-pre-wrap text-indigo-100/80">
                         {courseData.course}
                       </div>
                     </ScrollArea>
@@ -503,16 +506,16 @@ QUIZ: ${courseData.quiz}
               </TabsContent>
 
               <TabsContent value="skills" className="space-y-4">
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50">
+                <Card className="shadow-2xl border border-green-500/20 bg-gradient-to-br from-green-900/30 to-emerald-900/30 backdrop-blur-xl rounded-2xl">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-green-700">
+                    <CardTitle className="flex items-center gap-2 text-green-300">
                       <Target className="w-5 h-5" />
                       Skills Analysis
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ScrollArea className="h-[400px] pr-4">
-                      <div className="whitespace-pre-wrap text-gray-700">
+                      <div className="whitespace-pre-wrap text-indigo-100/80">
                         {courseData.skills_analysis}
                       </div>
                     </ScrollArea>
@@ -521,16 +524,16 @@ QUIZ: ${courseData.quiz}
               </TabsContent>
 
               <TabsContent value="content" className="space-y-4">
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-purple-50 to-indigo-50">
+                <Card className="shadow-2xl border border-purple-500/20 bg-gradient-to-br from-purple-900/30 to-indigo-900/30 backdrop-blur-xl rounded-2xl">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-purple-700">
+                    <CardTitle className="flex items-center gap-2 text-purple-300">
                       <FileText className="w-5 h-5" />
                       Course Content
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ScrollArea className="h-[400px] pr-4">
-                      <div className="whitespace-pre-wrap text-gray-700">
+                      <div className="whitespace-pre-wrap text-indigo-100/80">
                         {courseData.content}
                       </div>
                     </ScrollArea>
@@ -539,16 +542,16 @@ QUIZ: ${courseData.quiz}
               </TabsContent>
 
               <TabsContent value="quiz" className="space-y-4">
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-cyan-50 to-blue-50">
+                <Card className="shadow-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-900/30 to-blue-900/30 backdrop-blur-xl rounded-2xl">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-cyan-700">
+                    <CardTitle className="flex items-center gap-2 text-cyan-300">
                       <HelpCircle className="w-5 h-5" />
                       Course Quiz
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ScrollArea className="h-[400px] pr-4">
-                      <div className="whitespace-pre-wrap text-gray-700">
+                      <div className="whitespace-pre-wrap text-indigo-100/80">
                         {courseData.quiz}
                       </div>
                     </ScrollArea>

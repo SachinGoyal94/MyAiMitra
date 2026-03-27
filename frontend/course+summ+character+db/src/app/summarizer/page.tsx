@@ -31,6 +31,7 @@ import {
   Languages
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import AuroraBackground from '@/components/ui/AuroraBackground'
 
 interface SummaryResult {
   type: 'web' | 'youtube'
@@ -64,7 +65,7 @@ export default function Summarizer() {
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('en')
   
-  const API_BASE = 'https://summarizer-8zkh.onrender.com'
+  const API_BASE = 'https://sachingoyal94-summarizer-space.hf.space'
   const API_TIMEOUT = 30000 // 30 seconds timeout
 
   // Helper function for API calls with timeout and error handling
@@ -374,7 +375,9 @@ export default function Summarizer() {
   return (
     <>
       <FeatureGuide />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="min-h-screen relative overflow-hidden text-white">
+      <AuroraBackground />
+
       <style jsx>{`
         @keyframes slide-up {
           from { 
@@ -388,10 +391,10 @@ export default function Summarizer() {
         }
         @keyframes pulse-glow {
           0%, 100% { 
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
           }
           50% { 
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
           }
         }
         .slide-up {
@@ -405,36 +408,35 @@ export default function Summarizer() {
         }
         .summary-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
       `}</style>
 
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm transition-all duration-300">
+      <header className="border-b border-white/10 bg-black/50 backdrop-blur-xl sticky top-0 z-20 shadow-[0_4px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button 
                 variant="outline" 
                 onClick={handleBackToMain}
-                className="flex items-center gap-2 border-gray-200 hover:bg-gray-50 transition-all duration-300 hover:scale-[1.02]"
+                className="flex items-center gap-2 border-white/20 text-white/70 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to AI Chat
               </Button>
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:scale-110 transition-transform duration-300">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-200 via-indigo-200 to-purple-200 bg-clip-text text-transparent">
                   AI Content Summarizer
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-indigo-300/70">
                   Summarize websites, YouTube videos, and generate AI-powered blogs instantly
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">
+              <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
                 <Sparkles className="w-3 h-3 mr-1" />
                 AI Powered
               </Badge>
@@ -443,16 +445,16 @@ export default function Summarizer() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-4xl">
+      <main className="container mx-auto px-4 py-6 max-w-4xl relative z-10">
         <div className="space-y-6">
           {/* Input Section */}
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="shadow-2xl border border-white/10 bg-black/50 backdrop-blur-xl rounded-2xl">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-blue-600" />
-                <CardTitle className="text-xl">Content Input</CardTitle>
+                <Zap className="w-5 h-5 text-blue-400" />
+                <CardTitle className="text-xl text-white">Content Input</CardTitle>
               </div>
-              <CardDescription>
+              <CardDescription className="text-indigo-300/60">
                 Choose the type of content and operation you want to perform
               </CardDescription>
             </CardHeader>
@@ -460,19 +462,19 @@ export default function Summarizer() {
             <CardContent>
               {/* Mode Selection */}
               <div className="mb-6">
-                <Label className="text-sm font-medium mb-3 block">Operation Mode</Label>
+                <Label className="text-sm font-medium mb-3 block text-indigo-200">Operation Mode</Label>
                 <Tabs value={activeMode} onValueChange={(value) => {
                   if (value === 'blog' && !summaryGenerated) return; // Prevent switching to blog if no summary
                   setActiveMode(value as 'summarize' | 'blog')
                 }} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="summarize" className="flex items-center gap-2">
+                  <TabsList className="grid w-full grid-cols-2 bg-white/5 border border-white/10">
+                    <TabsTrigger value="summarize" className="flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70">
                       <FileText className="w-4 h-4" />
                       Summarize
                     </TabsTrigger>
                     <TabsTrigger 
                       value="blog" 
-                      className={`flex items-center gap-2 ${
+                      className={`flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70 ${
                         !summaryGenerated 
                           ? 'opacity-50 cursor-not-allowed' 
                           : ''
@@ -485,7 +487,7 @@ export default function Summarizer() {
                   </TabsList>
                 </Tabs>
                 {!summaryGenerated && (
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-indigo-300/50 mt-2">
                     Generate a summary first to enable blog generation
                   </p>
                 )}
@@ -493,12 +495,12 @@ export default function Summarizer() {
 
               {/* Content Type Selection */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="web" className="flex items-center gap-2">
+                <TabsList className="grid w-full grid-cols-2 bg-white/5 border border-white/10">
+                  <TabsTrigger value="web" className="flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70">
                     <Globe className="w-4 h-4" />
                     Website
                   </TabsTrigger>
-                  <TabsTrigger value="youtube" className="flex items-center gap-2">
+                  <TabsTrigger value="youtube" className="flex items-center gap-2 data-[state=active]:bg-white/10 data-[state=active]:text-white text-indigo-300/70">
                     <Youtube className="w-4 h-4" />
                     YouTube
                   </TabsTrigger>
@@ -506,19 +508,19 @@ export default function Summarizer() {
 
                 <TabsContent value="web" className="space-y-4 mt-6">
                   <div>
-                    <Label htmlFor="web-url">Website URL</Label>
+                    <Label htmlFor="web-url" className="text-indigo-200">Website URL</Label>
                     <Input
                       id="web-url"
                       type="url"
                       placeholder="https://example.com/article"
                       value={webUrl}
                       onChange={(e) => setWebUrl(e.target.value)}
-                      className="mt-2"
+                      className="mt-2 bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500/50 focus:ring-blue-500/30"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="web-language">Language Code for Summary/Blog</Label>
-                    <p className="text-xs text-muted-foreground mt-1 mb-2">
+                    <Label htmlFor="web-language" className="text-indigo-200">Language Code for Summary/Blog</Label>
+                    <p className="text-xs text-indigo-300/50 mt-1 mb-2">
                       Enter language code for desired output language (e.g., en, hi, es, fr, de, ja, zh, ar)
                     </p>
                     <Input
@@ -527,17 +529,17 @@ export default function Summarizer() {
                       placeholder="Enter language code (e.g., en, hi, es, fr, de)"
                       value={selectedLanguage}
                       onChange={(e) => setSelectedLanguage(e.target.value.toLowerCase())}
-                      className="mt-2"
+                      className="mt-2 bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500/50 focus:ring-blue-500/30"
                       maxLength={10}
                     />
                   </div>
                   <Button 
                     onClick={activeMode === 'summarize' ? summarizeWeb : generateBlogFromWeb}
                     disabled={isLoading || !webUrl.trim() || (activeMode === 'blog' && !summaryGenerated)}
-                    className={`w-full ${
+                    className={`w-full shadow-lg transition-all duration-300 hover:scale-[1.02] ${
                       activeMode === 'summarize' 
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white'
-                        : 'bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-500/30'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-purple-500/30'
                     }`}
                   >
                     {isLoading ? (
@@ -556,19 +558,19 @@ export default function Summarizer() {
 
                 <TabsContent value="youtube" className="space-y-4 mt-6">
                   <div>
-                    <Label htmlFor="youtube-url">YouTube URL</Label>
+                    <Label htmlFor="youtube-url" className="text-indigo-200">YouTube URL</Label>
                     <Input
                       id="youtube-url"
                       type="url"
                       placeholder="https://youtube.com/watch?v=..."
                       value={youtubeUrl}
                       onChange={(e) => setYoutubeUrl(e.target.value)}
-                      className="mt-2"
+                      className="mt-2 bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-red-500/50 focus:ring-red-500/30"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="youtube-language">Audio Language for Processing</Label>
-                    <p className="text-xs text-muted-foreground mt-1 mb-2">
+                    <Label htmlFor="youtube-language" className="text-indigo-200">Audio Language for Processing</Label>
+                    <p className="text-xs text-indigo-300/50 mt-1 mb-2">
                       Enter the language code for YouTube video transcript (e.g., en, hi, es, fr, de, ja, zh, ar)
                     </p>
                     <Input
@@ -577,23 +579,23 @@ export default function Summarizer() {
                       placeholder="Enter language code (e.g., en, hi, es, fr, de)"
                       value={selectedLanguage}
                       onChange={(e) => setSelectedLanguage(e.target.value.toLowerCase())}
-                      className="mt-2"
+                      className="mt-2 bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-red-500/50 focus:ring-red-500/30"
                       maxLength={10}
                     />
                   </div>
-                  <Alert className="bg-amber-50 border-amber-200">
-                    <AlertCircle className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="text-sm text-amber-800">
+                  <Alert className="bg-amber-500/10 border-amber-500/20">
+                    <AlertCircle className="h-4 w-4 text-amber-400" />
+                    <AlertDescription className="text-sm text-amber-300">
                       <strong>Important:</strong> YouTube video must have transcript available in the selected language for processing to work.
                     </AlertDescription>
                   </Alert>
                   <Button 
                     onClick={activeMode === 'summarize' ? summarizeYoutube : generateBlogFromYoutube}
                     disabled={isLoading || !youtubeUrl.trim() || (activeMode === 'blog' && !summaryGenerated)}
-                    className={`w-full ${
+                    className={`w-full shadow-lg transition-all duration-300 hover:scale-[1.02] ${
                       activeMode === 'summarize' 
-                        ? 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white'
-                        : 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white'
+                        ? 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white shadow-red-500/30'
+                        : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-500/30'
                     }`}
                   >
                     {isLoading ? (
@@ -614,35 +616,35 @@ export default function Summarizer() {
           </Card>
 
           {error && (
-            <Alert variant="destructive" className="slide-up">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+            <Alert variant="destructive" className="slide-up border-red-500/30 bg-red-500/10">
+              <AlertCircle className="h-4 w-4 text-red-400" />
+              <AlertDescription className="text-red-300">{error}</AlertDescription>
             </Alert>
           )}
 
           {/* Results Section */}
           {result ? (
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm summary-card slide-up">
+            <Card className="shadow-2xl border border-white/10 bg-black/50 backdrop-blur-xl rounded-2xl summary-card slide-up">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <CardTitle className="text-xl">Summary</CardTitle>
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <CardTitle className="text-xl text-white">Summary</CardTitle>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+                    <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
                       {result.type === 'web' && <Globe className="w-3 h-3 mr-1" />}
                       {result.type === 'youtube' && <Youtube className="w-3 h-3 mr-1" />}
                       {result.type.charAt(0).toUpperCase() + result.type.slice(1)}
                     </Badge>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    <Badge variant="outline" className="bg-blue-500/10 text-blue-300 border-blue-500/30">
                       <FileText className="w-3 h-3 mr-1" />
                       Summary
                     </Badge>
                   </div>
                 </div>
                 {result.url && (
-                  <CardDescription className="flex items-center gap-1">
+                  <CardDescription className="flex items-center gap-1 text-indigo-300/60">
                     <Link2 className="w-3 h-3" />
                     Source: {result.url}
                   </CardDescription>
@@ -650,7 +652,7 @@ export default function Summarizer() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4 text-sm text-indigo-300/60">
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {result.processingTime && 
@@ -665,8 +667,8 @@ export default function Summarizer() {
                   </div>
                 </div>
 
-                <ScrollArea className="h-[400px] w-full rounded-md border p-6">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                <ScrollArea className="h-[400px] w-full rounded-xl border border-white/10 bg-white/5 p-6">
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-indigo-100/80">
                     {result.summary}
                   </div>
                 </ScrollArea>
@@ -676,7 +678,7 @@ export default function Summarizer() {
                     variant="outline"
                     size="sm"
                     onClick={() => copyToClipboard(result.summary || '')}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/10 text-indigo-200/70 bg-white/5 hover:bg-white/10"
                   >
                     <Copy className="w-4 h-4" />
                     Copy Summary
@@ -685,7 +687,7 @@ export default function Summarizer() {
                     variant="outline"
                     size="sm"
                     onClick={downloadSummary}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/10 text-indigo-200/70 bg-white/5 hover:bg-white/10"
                   >
                     <Download className="w-4 h-4" />
                     Download
@@ -702,7 +704,7 @@ export default function Summarizer() {
                         })
                       }
                     }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/10 text-indigo-200/70 bg-white/5 hover:bg-white/10"
                   >
                     <Share2 className="w-4 h-4" />
                     Share
@@ -710,18 +712,18 @@ export default function Summarizer() {
                 </div>
 
                 {/* Blog Generation Section */}
-                <div className="border-t pt-6">
+                <div className="border-t border-white/10 pt-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <PenTool className="w-5 h-5 text-purple-600" />
-                    <h3 className="text-lg font-semibold">Generate Blog from Summary</h3>
+                    <PenTool className="w-5 h-5 text-purple-400" />
+                    <h3 className="text-lg font-semibold text-white">Generate Blog from Summary</h3>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-indigo-300/60 mb-4">
                     Use this summary to generate a complete blog post with AI assistance.
                   </p>
                   <Button 
                     onClick={() => setActiveMode('blog')}
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-500/30"
                   >
                     {isLoading ? (
                       <>
@@ -739,27 +741,27 @@ export default function Summarizer() {
               </CardContent>
             </Card>
           ) : blogResult ? (
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm summary-card slide-up">
+            <Card className="shadow-2xl border border-white/10 bg-black/50 backdrop-blur-xl rounded-2xl summary-card slide-up">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <CardTitle className="text-xl">Generated Blog</CardTitle>
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <CardTitle className="text-xl text-white">Generated Blog</CardTitle>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+                    <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
                       {blogResult.type === 'web' && <Globe className="w-3 h-3 mr-1" />}
                       {blogResult.type === 'youtube' && <Youtube className="w-3 h-3 mr-1" />}
                       {blogResult.type.charAt(0).toUpperCase() + blogResult.type.slice(1)}
                     </Badge>
-                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                    <Badge variant="outline" className="bg-purple-500/10 text-purple-300 border-purple-500/30">
                       <PenTool className="w-3 h-3 mr-1" />
                       Blog
                     </Badge>
                   </div>
                 </div>
                 {blogResult.url && (
-                  <CardDescription className="flex items-center gap-1">
+                  <CardDescription className="flex items-center gap-1 text-indigo-300/60">
                     <Link2 className="w-3 h-3" />
                     Source: {blogResult.url}
                   </CardDescription>
@@ -767,7 +769,7 @@ export default function Summarizer() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4 text-sm text-indigo-300/60">
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {blogResult.processingTime && 
@@ -782,8 +784,8 @@ export default function Summarizer() {
                   </div>
                 </div>
 
-                <ScrollArea className="h-[600px] w-full rounded-md border p-6">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                <ScrollArea className="h-[600px] w-full rounded-xl border border-white/10 bg-white/5 p-6">
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-indigo-100/80">
                     {blogResult.blog}
                   </div>
                 </ScrollArea>
@@ -793,7 +795,7 @@ export default function Summarizer() {
                     variant="outline"
                     size="sm"
                     onClick={() => copyToClipboard(blogResult.blog || '')}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/10 text-indigo-200/70 bg-white/5 hover:bg-white/10"
                   >
                     <Copy className="w-4 h-4" />
                     Copy Blog
@@ -802,7 +804,7 @@ export default function Summarizer() {
                     variant="outline"
                     size="sm"
                     onClick={downloadBlog}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/10 text-indigo-200/70 bg-white/5 hover:bg-white/10"
                   >
                     <Download className="w-4 h-4" />
                     Download
@@ -819,7 +821,7 @@ export default function Summarizer() {
                         })
                       }
                     }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/10 text-indigo-200/70 bg-white/5 hover:bg-white/10"
                   >
                     <Share2 className="w-4 h-4" />
                     Share
@@ -831,7 +833,7 @@ export default function Summarizer() {
                       setBlogResult(null)
                       setActiveMode('summarize')
                     }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/10 text-indigo-200/70 bg-white/5 hover:bg-white/10"
                   >
                     <FileText className="w-4 h-4" />
                     Back to Summary
@@ -840,15 +842,15 @@ export default function Summarizer() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="h-[400px] flex items-center justify-center shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="h-[400px] flex items-center justify-center shadow-2xl border border-white/10 bg-black/50 backdrop-blur-xl rounded-2xl">
               <CardContent className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 pulse-glow">
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2 text-white">
                   Ready to Summarize
                 </h3>
-                <p className="text-muted-foreground max-w-sm">
+                <p className="text-indigo-300/60 max-w-sm">
                   Enter a website URL or YouTube video link to generate an AI-powered summary instantly.
                 </p>
               </CardContent>

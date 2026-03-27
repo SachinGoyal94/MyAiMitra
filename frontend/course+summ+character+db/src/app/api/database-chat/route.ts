@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Call the external database chat API
-    const API_BASE = 'https://db-chat-eevy.onrender.com'
+    const API_BASE = 'https://sachingoyal94-db-chat-space.hf.space'
     
     // Create a timeout controller
     const controller = new AbortController()

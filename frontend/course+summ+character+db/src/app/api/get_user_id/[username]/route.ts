@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = 'https://persona-flow-zqxz.onrender.com'
+const BACKEND_URL = 'https://sachingoyal94-persona-flow-space.hf.space'
 
 export async function GET(
   request: NextRequest,

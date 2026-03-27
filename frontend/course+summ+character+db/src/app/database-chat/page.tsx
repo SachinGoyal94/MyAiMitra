@@ -48,7 +48,7 @@ export default function DatabaseChatPage() {
     mysql_port: '3306'
   })
 
-  const API_BASE = 'https://db-chat-eevy.onrender.com'
+  const API_BASE = 'https://sachingoyal94-db-chat-space.hf.space'
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
