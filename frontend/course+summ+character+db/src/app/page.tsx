@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { BACKEND_URLS } from '@/config/backend_urls'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -47,7 +48,7 @@ export default function Home() {
 
 
 
-  const API_BASE = 'https://my-ai-mitra.onrender.com'
+  const API_BASE = BACKEND_URLS.MAIN_APP
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {

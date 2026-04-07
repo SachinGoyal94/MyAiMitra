@@ -11,6 +11,7 @@ import { Loader2, Download, RefreshCw, ArrowLeft, Sparkles, Check } from 'lucide
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import AuroraBackground from '@/components/ui/AuroraBackground'
+import { BACKEND_URLS } from '@/config/backend_urls'
 
 export default function FlowchartGenerator() {
   const router = useRouter()
@@ -21,7 +22,7 @@ export default function FlowchartGenerator() {
   const [htmlContent, setHtmlContent] = useState<string | null>(null)
   const [flowchartId, setFlowchartId] = useState<string | null>(null)
 
-  const API_BASE_URL = 'https://sachingoyal94-flowchart-space.hf.space'
+  const API_BASE_URL = BACKEND_URLS.FLOWCHART
 
   const handleGenerateFlowchart = async () => {
     if (!input.trim()) {

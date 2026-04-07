@@ -32,6 +32,7 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AuroraBackground from '@/components/ui/AuroraBackground'
+import { BACKEND_URLS } from '@/config/backend_urls'
 
 interface SummaryResult {
   type: 'web' | 'youtube'
@@ -65,7 +66,7 @@ export default function Summarizer() {
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('en')
   
-  const API_BASE = 'https://sachingoyal94-summarizer-space.hf.space'
+  const API_BASE = BACKEND_URLS.SUMMARIZER
   const API_TIMEOUT = 30000 // 30 seconds timeout
 
   // Helper function for API calls with timeout and error handling

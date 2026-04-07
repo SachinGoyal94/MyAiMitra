@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { BACKEND_URLS } from '@/config/backend_urls'
 
-const BACKEND_URL = 'https://sachingoyal94-persona-flow-space.hf.space'
+
 
 export async function GET(
   request: NextRequest,
@@ -10,7 +11,7 @@ export async function GET(
     const { userId, personaId } = await params
 
     // Forward the request to the external backend
-    const response = await fetch(`${BACKEND_URL}/history/${userId}/${personaId}`)
+    const response = await fetch(`${BACKEND_URLS.PERSONA_FLOW}/history/${userId}/${personaId}`)
 
     if (response.ok) {
       const data = await response.json()

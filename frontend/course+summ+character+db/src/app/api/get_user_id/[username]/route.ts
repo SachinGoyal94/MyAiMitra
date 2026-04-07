@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { BACKEND_URLS } from '@/config/backend_urls'
 
-const BACKEND_URL = 'https://sachingoyal94-persona-flow-space.hf.space'
+
 
 export async function GET(
   request: NextRequest,
@@ -18,7 +19,7 @@ export async function GET(
 
     // Call the real backend to get user ID
     try {
-      const response = await fetch(`${BACKEND_URL}/get_user_id/${encodeURIComponent(username)}`, {
+      const response = await fetch(`${BACKEND_URLS.PERSONA_FLOW}/get_user_id/${encodeURIComponent(username)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

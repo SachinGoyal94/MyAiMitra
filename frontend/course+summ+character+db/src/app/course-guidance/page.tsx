@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Loader2, BookOpen, Target, FileText, HelpCircle, GraduationCap, TrendingUp, Award, Lightbulb, Bot, Wifi, WifiOff, Download, Copy, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AuroraBackground from '@/components/ui/AuroraBackground'
+import { BACKEND_URLS } from '@/config/backend_urls'
 
 interface CourseData {
   course: string
@@ -34,7 +35,7 @@ export default function CourseGuidancePage() {
   // Form state
   const [courseName, setCourseName] = useState('')
 
-  const API_BASE = 'https://sachingoyal94-course-gen-space.hf.space'
+  const API_BASE = BACKEND_URLS.COURSE_GUIDANCE
 
   // Check backend status on component mount
   React.useEffect(() => {

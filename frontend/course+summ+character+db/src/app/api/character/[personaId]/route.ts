@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { BACKEND_URLS } from '@/config/backend_urls'
 
-const BACKEND_URL = 'https://sachingoyal94-persona-flow-space.hf.space'
+
 
 export async function DELETE(
   request: NextRequest,
@@ -11,7 +12,7 @@ export async function DELETE(
     const formData = await request.formData()
 
     // Forward request to real backend
-    const response = await fetch(`${BACKEND_URL}/character/${personaId}`, {
+    const response = await fetch(`${BACKEND_URLS.PERSONA_FLOW}/character/${personaId}`, {
       method: 'DELETE',
       body: formData
     })
