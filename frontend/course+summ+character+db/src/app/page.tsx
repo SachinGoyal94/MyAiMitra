@@ -47,7 +47,7 @@ export default function Home() {
 
 
 
-  const API_BASE = 'https://my-ai-mitra.onrender.com/'
+  const API_BASE = 'https://my-ai-mitra.onrender.com'
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
