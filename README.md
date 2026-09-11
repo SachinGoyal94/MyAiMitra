@@ -324,13 +324,6 @@ We welcome contributions! Please follow these steps:
 - **Environment Variables**: Double-check your `.env` file configuration
 - **Dependencies**: Run `pip install -r requirements.txt` for backend
 
-## 👥 Maintainers
-
-- **Project Lead**: [@SachinGoyal94](https://github.com/SachinGoyal94) 
-- **Backend Team**: [@SachinGoyal94](https://github.com/SachinGoyal94), [@raghav-1411](https://github.com/raghav-1411)
-- **Frontend Team**: [@itzzpriyal](https://github.com/itzzpriyal), [@vrindachhabra](https://github.com/vrindachhabra)
-- **AI/ML Team**: [@SachinGoyal94](https://github.com/SachinGoyal94)
-
 ## 🏗️ System Architecture
 
 ```
