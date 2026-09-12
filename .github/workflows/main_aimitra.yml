@@ -60,6 +60,15 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DECBC83B68314377BDE38F36794EE5E2 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8670475D4A144F3CACD074F5FFCEE18A }}
 
+      - name: Ensure Azure Web App is running
+        run: |
+          WEBAPP_ID=$(az webapp list --query "[?name=='aimitra'].id | [0]" -o tsv)
+          if [ -z "$WEBAPP_ID" ]; then
+            echo "Could not find Azure Web App 'aimitra' in the current subscription."
+            exit 1
+          fi
+          az webapp start --ids "$WEBAPP_ID"
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
