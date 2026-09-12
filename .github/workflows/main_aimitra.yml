@@ -6,14 +6,12 @@ on:
     branches:
       - main
     paths:
-      - 'Backend/Chatbot/**' # 🟢 Only triggers if changes occur within the Chatbot service folder
+      - 'Backend/Chatbot/**'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -21,24 +19,21 @@ jobs:
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.12'
 
-      # 🛠️ Builds dependencies cleanly inside the Chatbot context
-      - name: Create and Start virtual environment and Install dependencies
+      # Installs dependencies directly into the Azure-native package folder
+      - name: Install dependencies
         working-directory: Backend/Chatbot
         run: |
-          python -m venv antenv
-          source antenv/bin/activate
-          pip install -r requirements.txt
-                
-      # 📦 Bundles only the Chatbot folder contents for deployment
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+
+      # Bundles Chatbot source and pre-built dependencies
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            Backend/Chatbot
-            !Backend/Chatbot/antenv/
+          path: Backend/Chatbot/
 
   deploy:
     runs-on: ubuntu-latest
@@ -52,7 +47,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
-      
+          path: ./app-package
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -65,3 +61,4 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'aimitra'
+          package: ./app-package
