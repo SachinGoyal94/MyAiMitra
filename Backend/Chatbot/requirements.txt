@@ -2,7 +2,7 @@ python-dotenv
 langchain_google_genai
 langchain_community
 langchain_huggingface
-sentence-transformers
+
 faiss-cpu
 langchain_chroma
 langchain_groq
@@ -15,6 +15,7 @@ pytube
 numexpr
 huggingface_hub
 fastapi
+gunicorn
 langserve
 sse_starlette
 pydantic
@@ -24,7 +25,7 @@ sqlalchemy
 pymysql
 passlib[bcrypt]
 python-jose
-transformers
+
 python-multipart
 bcrypt==4.3.0
 langchain_ollama
