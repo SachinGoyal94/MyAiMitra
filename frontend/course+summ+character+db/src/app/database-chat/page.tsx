@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { BACKEND_URLS } from '@/config/backend_urls'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -48,7 +49,7 @@ export default function DatabaseChatPage() {
     mysql_port: '3306'
   })
 
-  const API_BASE = 'https://sachingoyal94-db-chat-space.hf.space'
+
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function DatabaseChatPage() {
 
     try {
       // Test connection
-      const response = await fetch(`${API_BASE}/chat`, {
+      const response = await fetch(`${BACKEND_URLS.DB_CHAT}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

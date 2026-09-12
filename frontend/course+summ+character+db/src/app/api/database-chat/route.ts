@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { BACKEND_URLS } from '@/config/backend_urls'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,14 +16,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Call the external database chat API
-    const API_BASE = 'https://sachingoyal94-db-chat-space.hf.space'
+    // Call the external database chat API
     
     // Create a timeout controller
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 seconds timeout
     
     try {
-      const response = await fetch(`${API_BASE}/chat`, {
+      const response = await fetch(`${BACKEND_URLS.DB_CHAT}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

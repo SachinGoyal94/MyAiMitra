@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { BACKEND_URLS } from '@/config/backend_urls'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -39,7 +40,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
   const [currentMessage, setCurrentMessage] = useState('')
-  const [selectedEngine, setSelectedEngine] = useState('gemini-2.5-flash-lite-preview-06-17')
+  const [selectedEngine, setSelectedEngine] = useState('gemini-3.1-flash-lite-preview')
   const [useHistory, setUseHistory] = useState(true)
   const [maxHistory, setMaxHistory] = useState(10)
   const [mockMode, setMockMode] = useState(false)
@@ -47,7 +48,7 @@ export default function Home() {
 
 
 
-  const API_BASE = 'https://sachingoyal94-myaimitra.hf.space'
+  const API_BASE = BACKEND_URLS.MAIN_APP
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
@@ -162,7 +163,7 @@ export default function Home() {
         id: 1,
         question: "Hello! How are you?",
         answer: "Hello! I'm doing great, thank you for asking! I'm here to help you with any questions you might have. What would you like to know today?",
-        engine: "gemini-2.5-flash-lite-preview-06-17",
+        engine: "gemini-3.1-flash-lite-preview",
         timestamp: new Date(Date.now() - 3600000).toISOString()
       },
       {
