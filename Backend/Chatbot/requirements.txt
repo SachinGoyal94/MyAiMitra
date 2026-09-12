@@ -15,6 +15,7 @@ pytube
 numexpr
 huggingface_hub
 fastapi
+gunicorn
 langserve
 sse_starlette
 pydantic

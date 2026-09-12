@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - 'Backend/Chatbot/**'
+      - '.github/workflows/main_aimitra.yml'
   workflow_dispatch:
 
 jobs:
@@ -21,14 +22,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Installs dependencies directly into the Azure-native package folder
+      # Azure App Service's startup script looks for this virtual environment
+      # at /home/site/wwwroot/antenv.  Do not use a hidden .python_packages
+      # directory here: upload-artifact excludes hidden files by default.
       - name: Install dependencies
         working-directory: Backend/Chatbot
         run: |
+          python -m venv antenv
+          source antenv/bin/activate
           python -m pip install --upgrade pip
-          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+          python -m pip install -r requirements.txt
 
-      # Bundles Chatbot source and pre-built dependencies
+      # Bundles Chatbot source and the Azure-recognized antenv environment.
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
@@ -62,3 +67,5 @@ jobs:
         with:
           app-name: 'aimitra'
           package: ./app-package
+          # The artifact root is Backend/Chatbot, not the repository root.
+          startup-command: 'gunicorn main:app --worker-class uvicorn.workers.UvicornWorker --workers 2 --bind 0.0.0.0:8000 --timeout 120'
